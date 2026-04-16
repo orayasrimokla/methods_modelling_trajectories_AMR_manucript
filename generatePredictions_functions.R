@@ -593,7 +593,7 @@ run_predictions_test_GPR <- function(model, data,model_name, GPR_list,covar_list
   
   if(grepl("spatial", model_name)){
     
-    ext_fit <- model[[1]]$draws(format = "df")
+    ext_fit <- model$draws(format = "df")
     n_total_draws <- min(1000,length(ext_fit$lp__))
     sample_post <- sample(length(ext_fit$lp__), n_total_draws)
     
