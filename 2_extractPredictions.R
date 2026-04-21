@@ -14,7 +14,7 @@ source(paste0(path_cluster,"generatePredictions_functions.R")) #script with func
 options(mc.cores = parallel::detectCores()) #stan model will still run the number of cores equal to chain 
 #so for our code we have 3 chains so it will run at most 3 cores 
 
-data_grouped_covar_source <- data.frame(read.csv(file=paste0("/Users/orayasrim/Documents/AMR_AB/data_grouped_covar_source.csv")))
+data_grouped_covar_source <- data.frame(read.csv(file=paste0("pathTo/dataFile.csv")))
 
 #this should be the same for both data aggregates 
 country_id <- sort(unique(data_grouped_covar_source$location_id))
