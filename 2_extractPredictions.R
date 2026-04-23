@@ -197,7 +197,7 @@ llply(1:length(list_abx), function(i){
       sourceTest <- merge(sourceTest,test[, ..col_select], by = c("country_name","year_id"),all.x = TRUE)
       
       #sourceTest <- sourceTest[order(sourceTest$country_name,sourceTest$source,sourceTest$t), ]
-      sourceTest <- sourceTest[order(sourceTest$country_name,sourceTest$t), ] #need to order by year annd country
+      sourceTest <- sourceTest[order(sourceTest$country_name,sourceTest$t), ] #order by year and country
       
       #gives the predictions for each source in that country
       predictions_forward <- run_predictions(model,sourceTest, list_models_run[j])
