@@ -36,11 +36,12 @@
   <li class="li3"><span class="s2"></span><span class="s1">2_extractPredictions.R : Load models, extract predictions, extract model weights used for stacking</span></li>
   <li class="li3"><span class="s2"></span><span class="s1">3_modelStack.R : Load the models, load the stacking weights, generate ensemble predictions</span></li>
 </ul>
-<p class="p3"><span class="s1">Main Models (Nov 12, 2025):</span></p>
+<p class="p3"><span class="s1">Main Models (Nov 12, 2025, New Model Added: Oct 12, 2026):</span></p>
 <ul class="ul1">
   <li class="li3"><span class="s2"></span><span class="s1">betaGammaI0_country.stan : country-level random effects</span></li>
   <li class="li3"><span class="s2"></span><span class="s1">betaGammaI0_country_covar.stan : country-level random effects + covariates</span></li>
   <li class="li3"><span class="s2"></span><span class="s1">betaGammaI0_country_AddSource.stan : country and data source-level random effects</span></li>
+  <li class="li3"><span class="s2"></span><span class="s1">betaGammaI0_country_covar_AddSource.stan : country and data source-level random effects + covariates</span></li>
   <li class="li3"><span class="s2"></span><span class="s1">spatial_cmdStan.stan : spatial-effects</span></li>
   <li class="li3"><span class="s2"></span><span class="s1">spatialcmdStanSource.stan : spatial and data source-level effects</span></li>
   <li class="li3"><span class="s2"></span><span class="s1">spatialcmdStanSourceCovar.stan : spatial and data source-level effects + covariates</span></li>
