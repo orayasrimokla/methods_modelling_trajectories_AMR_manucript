@@ -87,11 +87,12 @@ parameters {
   // real<lower=0> etasq_gamma; // Maximum covariance between sites
   // real<lower=0> rhosq_gamma; // Rate of decline in covariance with distance
 
-  
+  real<lower=0> kappa_inv;
 }
 
 
 transformed parameters {
+   real<lower=0> kappa = inv(kappa_inv);
 
   //real<lower=0> sigma_phi = inv(sqrt(tau_phi)); // convert precision to sigma
 
@@ -145,7 +146,8 @@ model {
   
   log_gamma ~ normal(0,1);
   
-  rhosq ~ exponential(0.5); //determines the rate of decay between neighbours
+  //rhosq ~ exponential(0.5); //determines the rate of decay between neighbours
+  rhosq ~ lognormal(2,0.5); //determines the rate of decay between neighbours - prior based on scale of our distances
   etasq ~ exponential(1); // determines maximum covariance between two societies 
   z ~ normal(0, 1);
   
@@ -155,6 +157,7 @@ model {
   etasq_gamma ~ exponential(1);
   z_gamma ~ normal(0, 1);
 
+  kappa_inv ~ exponential(3);
 
 if (calc_likelihood == 1){
   
@@ -204,11 +207,14 @@ if (calc_likelihood == 1){
     lastYear = t[i];
 
     
-  
+
+//alternative likelihood
+ real prob_i = fmax( fmin(prob[i], 0.99999 ),0.00001);
+ y[i] ~ beta_binomial(cases[i], prob_i * kappa, (1 - prob_i) * kappa);
  
 
  
- y[i] ~ binomial(cases[i], fmax( fmin(prob[i], 0.99999 ),0.00001));
+ //y[i] ~ binomial(cases[i], fmax( fmin(prob[i], 0.99999 ),0.00001));
  
   }
 }
@@ -217,10 +223,9 @@ if (calc_likelihood == 1){
 //test with temp eqn
 generated quantities {
   vector[N] y_pred;
-  
   vector[N] log_lik;
-  // vector[N] y_pred_counts;
-  // vector[N] y_pred_prop;
+  vector[N] y_pred_counts;
+  vector[N] y_pred_prop;
 
 
   int lastCountry = -1;
@@ -262,8 +267,17 @@ generated quantities {
     lastI = y_pred[i];
     lastCountry = country[i];
     lastYear = t[i];
+    
+    //alternative likelihood
+    real prob_i = fmax( fmin(y_pred[i], 0.999999 ),0.000001);
 
-    log_lik[i] = binomial_lpmf(y[i]|cases[i], fmax(fmin(y_pred[i], 0.999999 ),0.000001));
+    y_pred_counts[i] = beta_binomial_rng(cases[i], prob_i * kappa, (1 - prob_i) * kappa);
+    y_pred_prop[i] = y_pred_counts[i]/cases[i];
+
+    log_lik[i] = beta_binomial_lpmf(y[i]| cases[i], prob_i * kappa, (1 - prob_i) * kappa);
+
+
+    //log_lik[i] = binomial_lpmf(y[i]|cases[i], fmax(fmin(y_pred[i], 0.999999 ),0.000001));
   }
 }
 

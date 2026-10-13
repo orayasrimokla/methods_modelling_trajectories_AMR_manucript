@@ -39,7 +39,12 @@ parameters {
   real<lower=0> sigma_gamma;
   //real gamma_tilde[C];
 
+  real<lower=0> kappa_inv;
+}
+
+transformed parameters {
   
+  real<lower=0> kappa = inv(kappa_inv);
 }
 
 
@@ -57,14 +62,18 @@ model {
 
   //reparam with beta gamma and I0
   beta ~ exponential(3);
-  sigma_beta ~ exponential(0.5);
+  //sigma_beta ~ exponential(0.5);
+  sigma_beta ~ lognormal(0,0.5); //alternative
   beta_c ~ normal(beta,sigma_beta);
   //beta_tilde ~ normal(0,1);
 
   gamma ~ exponential(3);
-  sigma_gamma ~ exponential(0.5);
+  //sigma_gamma ~ exponential(0.5);
+  sigma_gamma ~ lognormal(0,0.5); //alternative
   gamma_c ~ normal(gamma, sigma_gamma);
 
+
+  kappa_inv ~ exponential(3);
 
 if (calc_likelihood == 1){
   
@@ -121,10 +130,12 @@ if (calc_likelihood == 1){
 
     
   
+  
+//alternative likelihood 
+ real prob_i = fmax( fmin(prob[i], 0.99999 ),0.00001);
+ y[i] ~ beta_binomial(cases[i], prob_i * kappa, (1 - prob_i) * kappa);
  
-
- 
- y[i] ~ binomial(cases[i], fmax( fmin(prob[i], 0.99999 ),0.00001));
+ //y[i] ~ binomial(cases[i], fmax( fmin(prob[i], 0.99999 ),0.00001));
  
   }
 }
@@ -176,14 +187,24 @@ generated quantities {
   
     } 
     
-    y_pred_counts[i] = binomial_rng(cases[i],fmax(fmin(y_pred[i], 0.999999 ),0.000001));
-    y_pred_prop[i] = y_pred_counts[i]/cases[i];
+    
+    // y_pred_counts[i] = binomial_rng(cases[i],fmax(fmin(y_pred[i], 0.999999 ),0.000001));
+    // y_pred_prop[i] = y_pred_counts[i]/cases[i];
     
     lastI = y_pred[i];
     lastCountry = country[i];
     lastYear = t[i];
     
-    log_lik[i] = binomial_lpmf(y[i]|cases[i], fmax(fmin(y_pred[i], 0.999999 ),0.000001));
+    //alternative likelihood
+    real prob_i = fmax( fmin(y_pred[i], 0.999999 ),0.000001);
+
+    y_pred_counts[i] = beta_binomial_rng(cases[i], prob_i * kappa, (1 - prob_i) * kappa);
+    y_pred_prop[i] = y_pred_counts[i]/cases[i];
+
+    log_lik[i] = beta_binomial_lpmf(y[i]| cases[i], prob_i * kappa, (1 - prob_i) * kappa);
+ 
+    
+    //log_lik[i] = binomial_lpmf(y[i]|cases[i], fmax(fmin(y_pred[i], 0.999999 ),0.000001));
   }
 }
 
