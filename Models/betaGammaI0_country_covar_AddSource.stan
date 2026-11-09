@@ -98,7 +98,7 @@ model {
   sigma_gamma ~ lognormal(0,0.5); //alternative
   gamma_c ~ normal(gamma, sigma_gamma);
   
-  
+  eta ~ normal(0,0.10);
   //add source level effects 
   //source_eta ~ normal(0,1);
   //sigma_source_eta ~ exponential(0.5); 
